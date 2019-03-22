@@ -1,0 +1,26 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+
+<section class="w3-container w3-center w3-content" style="max-width:300px">
+  <h6> WHOLESALE LOGIN PAGE</h6><BR><BR></BR></BR>
+    <form name="login">
+      Username :<input type="text" name="userid"/><br><br>
+      Password :<input type="password" name="pswrd"/><br><br>
+      <input type="button" onclick="check(this.form)" value="Login"/>
+      <input type="reset" value="Cancel"/>
+      </form>
+      <script language="javascript">
+      function check(form)
+      {
+       /the following code checkes whether the entered userid and password are matching/
+       if(form.userid.value == "admin" && form.pswrd.value == "admin")
+        {
+          window.open('/stockclient/views/wholesale.html')
+        }
+       else
+       {
+         alert("Error Password or Username")
+        }
+      }
+      </script> 
+  </section>

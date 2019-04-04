@@ -18,28 +18,36 @@ const SW_NAMESPACE = _hash(SW_FAMILY).substring(0, 6)
 //function to obtain the payload obtained from the client
 var _decodeRequest = function _decodeRequest(payload) {
     payload = payload.toString().split(',');
-    if (payload.length === 3) {
+    if (payload.length === 2) {
         var payload_data = {
-            action: payload[0],
-            quantity: payload[1],
-            sendTo: payload[2]
+          action: payload[0],
+          quantity: payload[1]
         }
-
-    } else {
+    }
+    else if (payload.length === 3) {
+       var payload_data = {
+        action: payload[0],
+        quantity: payload[1],
+        sendTo: payload[2]
+       }
+    }     
+       else {
         throw new InvalidTransaction('Invalid payload serialization');
-
-    }
-    if (!update.action) {
-        throw new InvalidTransaction('Action is required')
-    }
-    let quantity = update.quantity
-    if (quantity === null || quantity === undefined) {
-        throw new InvalidTransaction('Value is required')
-    }
-    quantity = parseInt(quantity)
-    if (typeof quantity !== "number" || quantity <= MIN_VALUE) {
-        throw new InvalidTransaction(`Value must be an integer ` + `no less than 1`)
-    }
+        
+      }
+      if (!payload_data.action) {
+        throw new InvalidTransaction('Action is required');
+      }
+      var quantity = payload_data.quantity;
+      if (quantity === null || quantity === undefined) {
+        throw new InvalidTransaction('Value is required');
+      }
+      quantity = parseInt(quantity);
+      if (typeof quantity !== "number" || quantity <= MIN_VALUE) {
+        throw new InvalidTransaction('Value must be an integer ' + 'no less than 1');
+      }
+  return payload_data
+  }
     //function to display the errors
     const _toInternalError = (err) => {
         console.log(" in error message block")
@@ -75,29 +83,25 @@ const addStock =(context, address, quantity, user)  => (possibleAddressValues) =
   }
     //function to send a request action
     const sendRequest = (context, senderAddress, quantity, receiverAddress) => (possibleAddressValues) => {
-        let wholesalerStock
+        
         let currentEntry = possibleAddressValues[senderAddress]
         let currentEntryTo = possibleAddressValues[receiverAddress]
-        let wholesalerNewStock = 0
         let retailerStock
         let retailerNewStock = 0
         if (currentEntry == null || currentEntry == '')
             console.log("No wholsesale agent available")
         if (currentEntryTo == null || currentEntryTo == '')
             console.log("No retail agent available")
-        wholesalerStock = decoder.decode(currentEntry)
-        wholesalerStock = parseInt(wholesalerStock)
         retailerStock = decoder.decode(currentEntryTo)
         retailerStock = parseInt(retailerStock)
-        if (retailerStock < quantity) {
-            throw new InvalidTransaction("stock requested must be less than the stock available")
+        if (retailerStock > quantity) {
+            throw new InvalidTransaction("stock requested must be greater than the stock available")
         }
         else {
-            console.log("sending request to wholesaler" + quantity)
+            console.log("sending request to" + receiverAddress + "for" + quantity)
             let stateData = wholesalerNewStock.toString()
             _setEntry(context, senderAddress, stateData)
             stateData = retailerNewStock.toString()
-            console.log("Wholesaler stock" + wholesalerNewStock + ", Retailer Stock" + retailerNewStock)
             return _setEntry(context, receiverAddress, stateData)
         }
     }
@@ -143,17 +147,6 @@ const addStock =(context, address, quantity, user)  => (possibleAddressValues) =
                     let header = transactionProcessRequest.header
                     let userPublicKey = header.signerPublicKey
                     let action = update.action
-                    if (!update.action) {
-                        throw new InvalidTransaction('Action is required')
-                      }
-                      let quantity = update.quantity
-                      if (quantity === null || quantity === undefined) {
-                        throw new InvalidTransaction('Value is required')
-                      }
-                      quantity = parseInt(quantity)
-                      if (typeof quantity !== "number" ||  quantity <= MIN_VALUE) {
-                        throw new InvalidTransaction(`Value must be an integer ` + `no less than 1`)
-                      }
 
                     // Select the action to be performed
                     let actionFn
@@ -196,5 +189,5 @@ const addStock =(context, address, quantity, user)  => (possibleAddressValues) =
                 })
         }
     }
-}
+
 module.exports = StockManagementHandler

@@ -18,7 +18,7 @@ services:
          - no_proxy
      volumes:
          - '.:/project/stockmanagement/stockclient'
-  cookiejar_processor:
+  stock_processor:
     container_name: stock_processor
     build:
       context: .
